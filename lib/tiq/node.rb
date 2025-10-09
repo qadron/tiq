@@ -5,16 +5,6 @@ require_relative 'client'
 
 module Tiq
 
-    def Service( node, shortname = nil, &block )
-        node.register_service shortname, proc { |*arguments| block.call( *arguments ) }
-    end
-
-    def Serve( node, shortname, *args, &block )
-        node.serve( shortname, *args, &block )
-    end
-
-    extend self
-
 class Node
 
     INTERVAL_PING = 5
@@ -39,7 +29,7 @@ class Node
 
         @dead_nodes = Set.new
         @peers      = Set.new
-        @services   = {}
+        @addons   = {}
         @nodes_info_cache = []
 
         host, port = @url.split( ':' )
@@ -107,17 +97,21 @@ class Node
         run
     end
 
-    def register_service( name, service, options = {} )
-        @services[name.to_s] = Service.new( self, service, options = {} )
+    def attach_addon( name, service, options = {} )
+        @addons[name.to_s] = Addon.new( self, service, options )
         nil
     end
 
-    def services
-        @server.handlers.keys
+    def call_addon( name, *arguments )
+        @addons[name.to_s].call( *arguments )
     end
 
-    def serve( name, *arguments )
-        @services[name.to_s].call( *arguments )
+    def addons
+        @addons.keys
+    end
+
+    def dettach_addon( name )
+        @addons.delete name
     end
 
     # @return   [Boolean]

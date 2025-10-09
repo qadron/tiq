@@ -130,13 +130,13 @@ end
 node_1 = MyNode.new( url: "localhost:9999" )
 
 # Add a service to the node, called :poll.
-Tiq::Service node_1, :poll do |arguments = nil|
+Tiq::Addon::Attach node_1, :poll do |arguments = nil|
     p "SERVICE: #{arguments}"
 end
 
 # Interact with the service via a Client.
 client_1 = MyClient.new( "localhost:9999" )
-Tiq::Serve client_1, :poll, 'ping' do
+Tiq::Addon  client_1, :poll, 'ping' do
     puts "CLIENT: #{r}"
 end
 ```
