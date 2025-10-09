@@ -83,12 +83,33 @@ p client.info
 
 ### Channel
 
-`Tik::Channel` offers client-side access to the _Shared Data_; a Shared HashMap.
+Chanel _Nodes_ offer client-side access to the _Shared Data_; a Shared HashMap.
 
 This enables the establishment of channels via callbacks upon _Data_
-operations
+operations.
 
 ```ruby
+class MyNode < Tiq::Node
+end
+
+class MySecondNode < Tiq::Node
+end
+
+class MyChannelNode < Tiq::Node
+end
+
+# Set up initial Node, the start of the cluster.
+node_1  = MyNode.new( url: "localhost:9999" )
+node_2  = MySecondNode.new( url: "localhost:9998", peer: 'localhost:9999' )
+channel = MyChannelNode.new( url: "localhost:9997", peer: 'localhost:9999' ).data
+sleep 1
+
+channel.on_set :my_signal do |value|
+    p "#{:on_set} - #{value}"
+end
+
+node_1.data.set :my_signal, 'tada!'
+sleep 1
 
 ```
 
