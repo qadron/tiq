@@ -4,11 +4,23 @@ require_relative 'channel'
 require_relative 'client'
 
 module Tiq
+
+    def Service( node, shortname = nil, &block )
+        node.register_service shortname, proc { |*arguments| block.call( *arguments ) }
+    end
+
+    def Serve( node, shortname, *args, &block )
+        node.serve( shortname, *args, &block )
+    end
+
+    extend self
+
 class Node
 
     INTERVAL_PING = 5
 
     attr_reader :data
+    attr_reader :services
     attr_reader :reactor
 
     # Initializes the node by:
@@ -27,6 +39,7 @@ class Node
 
         @dead_nodes = Set.new
         @peers      = Set.new
+        @services   = {}
         @nodes_info_cache = []
 
         host, port = @url.split( ':' )
@@ -76,9 +89,14 @@ class Node
                     next
                 end
 
-                grid_peers << peer
-                grid_peers.each { |url| add_peer url }
-                announce @url
+                begin
+                    grid_peers << peer
+                    grid_peers.each { |url| add_peer url }
+
+                    announce @url
+                rescue => e
+                    p e
+                end
             end
         end
 
@@ -87,6 +105,19 @@ class Node
         log_updated_peers
 
         run
+    end
+
+    def register_service( name, service, options = {} )
+        @services[name.to_s] = Service.new( self, service, options = {} )
+        nil
+    end
+
+    def services
+        @server.handlers.keys
+    end
+
+    def serve( name, *arguments )
+        @services[name.to_s].call( *arguments )
     end
 
     # @return   [Boolean]
@@ -114,7 +145,7 @@ class Node
         $stdout.puts "Adding peer: #{node_url}"
         @peers << node_url
 
-        connect_to_peer( @peers.to_a.first ).update_data( @data.to_h )
+        connect_to_peer( node_url ){ update_data( @data.to_h ) }
 
         log_updated_peers
         true

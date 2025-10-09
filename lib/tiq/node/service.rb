@@ -1,5 +1,7 @@
 module Tiq
+
 class Node
+
 
     # Base class and namespace for all node services.
     #
@@ -32,10 +34,15 @@ class Node
         attr_reader :data
         attr_reader :options
 
-        def initialize( node, options = {} )
+        def initialize( node, payload, options = {} )
             @node    = node
             @options = options
             @data    = @node.data
+            @payload = payload
+        end
+
+        def call( *aguments, &block )
+            @payload.call( *aguments, &block )
         end
 
         # @return   [Server::node::Node]
