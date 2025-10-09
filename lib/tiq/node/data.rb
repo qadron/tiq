@@ -81,9 +81,9 @@ class Data
         @hash.dup
     end
 
-    # private
+    private
 
-    def call_on_set( k, v, broadcast = true )
+    def call_on_set( k, v )
         k = sanitize_key( k )
 
         # p "#{@node} call_on_set #{k} 2"
@@ -95,13 +95,6 @@ class Data
                 cb.call v
             end
         end
-
-        if broadcast
-            each_peer do |peer, iterator|
-                peer.call_on_set( k, v, false ) { iterator.next }
-            end
-        end
-
 
         nil
     end
