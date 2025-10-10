@@ -73,7 +73,7 @@ class Data
     end
 
     def on_delete( k, &block )
-        (@on_delete_cb ||= []) << block
+        (@on_delete_cb[sanitize_key( k )] ||= []) << block
         nil
     end
 
@@ -92,7 +92,7 @@ class Data
 
         if @on_set_cb[k]
             @on_set_cb[k].each do |cb|
-                cb.call v
+                cb.call k, v
             end
         end
 
@@ -104,7 +104,7 @@ class Data
         return if !@on_delete_cb[k]
 
         @on_delete_cb[k].each do |cb|
-            cb.call
+            cb.call k
         end
 
         nil

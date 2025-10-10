@@ -2,8 +2,9 @@
 
 source "https://rubygems.org"
 
-# gem "raktr"
-# gem "toq", path: '../toq'
-# gem "msgpack"
+gem "raktr"
+gem "toq", path: '../toq'
+gem "msgpack"
 
 # gem "rails"
+gem 'rspec'
