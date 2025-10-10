@@ -33,8 +33,8 @@ class Node
             @payload = payload
         end
 
-        def call( *aguments, &block )
-            @payload.call( *aguments, &block )
+        def call( *arguments, &block )
+            instance_eval { @payload.call *arguments, &block }
         end
 
         # @return   [Server::node::Node]
