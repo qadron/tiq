@@ -29,17 +29,17 @@
 
 ## Synopsis
 
-Tiq is a simple and lightweight clustering solution protocol.
+Tiq is a simple and lightweight clustering solution.
 
-This implementation is based on [Toq](https://github.com/qadron/toq) for Remote Procedure Call needs.
+This implementation is based on [Toq](https://github.com/qadron/toq) to cover Remote Procedure Call needs.
 
 ## Concepts
 
-There are a few key concepts in `Tik`:
+There are a few key concepts in `Tiq`:
 
 ### Node
 
-`Tik::Node` offers _Node_ representations, _server-side_ presences if you must.
+`Tiq::Node` offers _Node_ representations, _server-side_ presences if you must.
 
 To start a _Node_, you need to create a class that inherits from `Tiq::Node`
 and instantiate it with a URL to bind to.
@@ -67,7 +67,7 @@ node_2 = MySecondNode.new( url: "localhost:9998", peer: 'localhost:9999' )
 
 ### Client
 
-`Tik::Client` offers a _Client_ to enable _Node_/User communications.
+`Tiq::Client` offers a _Client_ to enable _Node_/User communications.
 
 ```ruby
 client = MyClient.new( "localhost:9999" )

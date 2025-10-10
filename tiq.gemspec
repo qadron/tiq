@@ -7,7 +7,7 @@
 =end
 
 Gem::Specification.new do |s|
-      require File.expand_path( File.dirname( __FILE__ ) ) + '/lib/tiq/version'
+      require File.expand_path( File.dirname( __FILE__ ) ) + '/lib/tiq'
 
       s.name              = 'tiq'
       s.version           = Tiq::VERSION
@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
       s.email             = 'tasos.laskos@gmail.com'
       s.authors           = [ 'Tasos Laskos' ]
 
-      s.files             = %w(README.md Rakefile LICENSE.md CHANGELOG.md)
+      s.files             = %w(README.md LICENSE.md CHANGELOG.md)
       s.files            += Dir.glob('lib/**/**')
       s.files            += Dir.glob('examples/**/**')
       s.test_files        = Dir.glob('spec/**/**')
