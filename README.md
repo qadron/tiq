@@ -132,9 +132,6 @@ every _Node_.
 class MyNode < Tiq::Node
 end
 
-class MyClient < Tiq::Client
-end
-
 # Set up initial Node.
 node_1 = MyNode.new( url: "localhost:9999" )
 
@@ -144,8 +141,7 @@ Tiq::Addon::Attach node_1, :poll do |arguments = nil|
 end
 
 # Interact with the service via a Client.
-client_1 = MyClient.new( "localhost:9999" )
-Tiq::Addon  client_1, :poll, 'ping' do
+Tiq::Addon "localhost:9999", :poll, 'ping' do
     puts "CLIENT: #{r}"
 end
 ```

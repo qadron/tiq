@@ -1,5 +1,6 @@
 require 'set'
 require_relative 'node/data'
+require_relative 'node/addon'
 require_relative 'channel'
 require_relative 'client'
 
@@ -98,11 +99,18 @@ class Node
     end
 
     def attach_addon( name, service, options = {} )
-        @addons[name.to_s] = Addon.new( self, service, options )
+        if @addons[name.to_s]
+            fail "Add-on already registered with name: #{name}"
+        end
+        @addons[name.to_s] = Node::Addon.new( self, service, options )
         nil
     end
 
     def call_addon( name, *arguments )
+        if !@addons[name.to_s]
+            fail "Add-on not attached with name: #{name}"
+        end
+
         @addons[name.to_s].call( *arguments )
     end
 
@@ -111,6 +119,10 @@ class Node
     end
 
     def dettach_addon( name )
+        if !@addons[name.to_s]
+            fail "Add-on not attached with name: #{name}"
+        end
+
         @addons.delete name
     end
 

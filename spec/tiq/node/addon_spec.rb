@@ -19,13 +19,17 @@ describe 'Tiq::Node::Addon' do
     end
 
     it 'attaches and calls an addon' do
-        node.attach_addon( 'echo', 'Tiq::Service::Echo' )
+        node.attach_addon 'echo', proc {  |arguments|
+            arguments
+        }
         result = node.call_addon( 'echo', 'hello' )
         expect( result ).to eq 'hello'
     end
 
     it 'lists addons' do
-        node.attach_addon( 'echo', 'Tiq::Service::Echo' )
+        node.attach_addon 'echo', proc {  |arguments|
+            arguments
+        }
         expect( node.addons ).to include 'echo'
     end
 end

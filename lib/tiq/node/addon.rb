@@ -1,7 +1,8 @@
 module Tiq
 
-    def self.Addon( node, shortname, *args, &block )
-        node.call_addon( shortname, *args, &block )
+    def self.Addon( client_or_url, shortname, *args, &block )
+        client = client_or_url.is_a?( Tiq::Client ) ? client_or_url : Tiq::Client.new( client_or_url )
+        client.call_addon( shortname, *args, &block )
     end
 
     module Addon
