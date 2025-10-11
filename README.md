@@ -2,10 +2,6 @@
 
 <table>
     <tr>
-        <th>Version</th>
-        <td>0.0.1</td>
-    </tr>
-    <tr>
         <th>Github page</th>
         <td><a href="http://github.com/qadron/tiq">http://github.com/qadron/tiq</a></td>
      </tr>
@@ -19,7 +15,7 @@
     </tr>
     <tr>
         <th>Copyright</th>
-        <td>2025 <a href="https://ecsypno.com">Ecsypno</a></td>
+        <td><a href="mailto:tasos.laskos@gmail.com">Tasos Laskos</a></td>
     </tr>
     <tr>
         <th>License</th>
