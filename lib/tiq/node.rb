@@ -37,7 +37,7 @@ class Node
         options[:host] ||= host || 'localhost'
         options[:port] ||= port || 9999
 
-        @server  = Toq::Server.new( host: options[:host], port: options[:port] )
+        @server  = Toq::Server.new( options.merge( host: options[:host], port: options[:port] ) )
         @reactor = @server.reactor
         @server.add_async_check do |method|
             # methods that expect a block are async
