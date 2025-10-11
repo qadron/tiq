@@ -2,17 +2,16 @@ require 'msgpack'
 require 'toq'
 
 module Tiq
-class Channel
+class Channel < Toq::Client
 
     def initialize( url, options = {} )
         host, port = url.split( ':' )
-        @client = Toq::Client.new( options.merge( host: host, port: port.to_i ) )
+        super( options.merge( host: host, port: port.to_i ) )
     end
 
     def method_missing( method, *args, &block )
-        @client.call( "data.#{method}", *args, &block )
+        call( "data.#{method}", *args, &block )
     end
 
 end
-
 end
