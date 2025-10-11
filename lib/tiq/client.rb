@@ -1,4 +1,5 @@
 require 'msgpack'
+require 'toq'
 
 module Tiq
 class Client < Toq::Client
