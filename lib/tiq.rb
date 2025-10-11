@@ -4,5 +4,5 @@ require_relative 'tiq/client'
 require_relative 'tiq/channel'
 
 module Tiq
-    VERSION = '0.1'
+    VERSION = '0.2'
 end
