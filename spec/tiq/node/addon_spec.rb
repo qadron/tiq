@@ -32,4 +32,47 @@ describe 'Tiq::Node::Addon' do
         }
         expect( node.addons ).to include 'echo'
     end
+
+    describe 'Tiq.Addon' do
+        it 'calls an Addon to handle the request' do
+            Tiq::Addon.Attach( node, 'echo' ) { |arguments|
+                arguments
+            }
+            result = Tiq::Addon( 'localhost:9999', 'echo', 'test' )
+            expect( result ).to eq 'test'
+        end
+    end
+
+    describe Tiq::Addon do
+        describe '.Attach' do
+            it 'attaches an Addon' do
+                Tiq::Addon.Attach( node, 'echo' ) { |arguments|
+                    arguments
+                }
+                result = Tiq::Addon( 'localhost:9999', 'echo', 'test' )
+                expect( result ).to eq 'test'
+            end
+        end
+
+        describe '.Dettach' do
+            it 'dettaches an Addon' do
+                Tiq::Addon::Attach( node, 'echo' ) { |arguments|
+                    arguments
+                }
+                result = Tiq::Addon( 'localhost:9999', 'echo', 'test' )
+                expect( result ).to eq 'test'
+
+                Tiq::Addon.Dettach( node, 'echo' )
+
+                result = nil
+                begin
+                    Tiq::Addon( 'localhost:9999', 'echo', 'test' )
+                rescue => e
+                    result = e
+                end
+
+                expect(result.class).to be Toq::Exceptions::RemoteException
+            end
+        end
+    end
 end
