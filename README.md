@@ -19,18 +19,9 @@
     </tr>
     <tr>
         <th>License</th>
-        <td><a href="file.LICENSE.html">3-clause BSD</a></td>
+        <td><a href="file.LICENSE.html">MPL v2</a></td>
     </tr>
 </table>
-
-## Quadron Overall
-
-* [Cuboid](https://github.com/qadron/cuboid) -- Cluster partitioning.
-* -> **[Tiq](https://github.com/qadron/tiq)** -- Clustering solution.
-* [Toq](https://github.com/qadron/toq) -- RPC handling.
-* [Ratkr](https://github.com/qadron/raktr) -- Network connection handling.
-
-Also be sure to check-out [dSel](https://github.com/qadron/dsel) for spiffy DSL generation.
 
 ## Synopsis
 
