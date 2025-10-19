@@ -8,3 +8,5 @@ gem "msgpack"
 
 # gem "rails"
 gem 'rspec'
+
+gemspec
