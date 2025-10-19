@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
 
       s.name              = 'tiq'
       s.version           = Tiq::VERSION
-      s.license           = 'BSD 3-Clause'
+      s.license           = 'MPL v2'
       s.date              = Time.now.strftime('%Y-%m-%d')
       s.summary           = 'Simple RPC protocol.'
       s.homepage          = 'https://github.com/qadron/tiq'
