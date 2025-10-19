@@ -10,9 +10,11 @@ class Node
 
     INTERVAL_PING = 5
 
+    attr_reader :url
     attr_reader :data
     attr_reader :services
     attr_reader :reactor
+    attr_reader :server
 
     # Initializes the node by:
     #
@@ -33,7 +35,11 @@ class Node
         @addons   = {}
         @nodes_info_cache = []
 
-        host, port = @url.split( ':' )
+        host = port = nil
+        if @url
+            host, port = @url.split( ':' )
+        end
+
         options[:host] ||= host || 'localhost'
         options[:port] ||= port || 9999
 
@@ -95,7 +101,7 @@ class Node
 
         log_updated_peers
 
-        run
+        # run if !options.include?(:run) || options[:run]
     end
 
     def attach_addon( name, service, options = {} )
@@ -226,6 +232,7 @@ class Node
     end
 
     def run
+        # @server.reactor.ensure_reactor_running
         $stdout.puts 'Running'
         @server.start
     rescue => e
