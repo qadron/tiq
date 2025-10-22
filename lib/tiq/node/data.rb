@@ -4,13 +4,14 @@ class Data
 
     CONCURRENCY = 20
 
-    def initialize( node )
+    def initialize( node, options = {} )
         @hash = {}
 
         @on_set_cb    = {}
         @on_delete_cb = {}
 
-        @node = node
+        @handler = (options[:name] || 'data').to_s
+        @node    = node
     end
 
     def update( data )
@@ -66,7 +67,7 @@ class Data
         nil
     end
 
-    def on_set( k, &block )
+    def on_set( k = nil, &block )
         # p "#{@node} on_set #{k} 0 #{block}"
         (@on_set_cb[sanitize_key( k )] ||= []) << block
         nil
@@ -119,7 +120,7 @@ class Data
 
     def connect_to_peer( url, options = {} )
         @rpc_clients      ||= {}
-        @rpc_clients[url] ||= Tiq::Client.new( url, options.merge( handler: :data ) )
+        @rpc_clients[url] ||= Tiq::Client.new( url, options.merge( handler: @handler ) )
     end
 
     def sanitize_key( k )

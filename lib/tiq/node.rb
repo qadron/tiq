@@ -74,7 +74,7 @@ class Node
 
         @reactor.run_in_thread if !@reactor.running?
 
-        @channel = Tiq::Node::Data.new( self )
+        @channel = Tiq::Node::Data.new( self, name: 'data' )
         @server.add_handler( 'data', @channel )
 
         @reactor.on_error do |_, e|
@@ -155,6 +155,37 @@ class Node
         @addons.delete name
     end
 
+    def create_group_handler( name, broadcast = true, &block )
+        h = Tiq::Node::Data.new( self, name: name.to_s )
+        @server.add_handler( name.to_s, h )
+
+        if !broadcast
+            block.call
+            return
+        end
+
+        each = proc { |peer, iterator|
+            begin
+                p 1818
+                connect_to_peer( peer ).create_group_handler( name, false ) { |_, i2| iterator.next; i2.next }
+                p 5252
+            rescue => e
+                p e
+            end
+        }
+        after = proc {
+            p 37367839389389
+        }
+
+        @reactor.create_iterator( @peers, 20 ).each( each, after )
+        nil
+    rescue => e
+    p e
+    e.backtrace.each do |l|
+      p l
+    end
+    end
+
     # @return   [Boolean]
     #   `true` if grid member, `false` otherwise.
     def grid_member?
@@ -162,7 +193,7 @@ class Node
     end
 
     def unplug
-        @server.create_iterator( @peers, 20 ).each do |peer, iterator|
+        @reactor.create_iterator( @peers, 20 ).each do |peer, iterator|
             connect_to_peer( peer ).remove_peer( @url ) { iterator.next }
         end
 
@@ -262,6 +293,8 @@ class Node
         q = Queue.new
         self.class.when_ready( @url) { q << Client.new( @url ) }
         q.pop
+
+        self
     rescue => e
         $stderr.puts e
         $stderr.puts "Could not start server"

@@ -5,7 +5,7 @@ module Tiq
 class Client < Toq::Client
 
     def initialize( url, options = {} )
-        @handler = options[:handler] || 'node'
+        @handler = (options[:handler] || 'node').to_s
 
         host, port = url.split( ':' )
         super( options.merge( host: host, port: port.to_i ) )
