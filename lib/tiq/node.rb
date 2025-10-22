@@ -35,7 +35,6 @@ class Node
 
     attr_reader :url
     attr_reader :data
-    attr_reader :services
     attr_reader :reactor
     attr_reader :server
 
