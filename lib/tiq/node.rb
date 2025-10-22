@@ -1,4 +1,5 @@
 require 'set'
+require 'yaml'
 require_relative 'node/data'
 require_relative 'node/addon'
 require_relative 'channel'
@@ -7,6 +8,28 @@ require_relative 'client'
 module Tiq
 
 class Node
+
+    class <<self
+
+        def when_ready( url, &block )
+            client = Client.new( url, client_max_retries: 0, connection_pool_size: 1 )
+            r = Raktr.new
+            r.run_in_thread
+            r.delay( 0.1 ) do |task|
+                client.alive? do |r|
+                    if r.rpc_exception?
+                        r.delay( 0.1, &task )
+                        next
+                    end
+
+                    client.close
+
+                    block.call
+                end
+            end
+        end
+
+    end
 
     INTERVAL_PING = 5
 
@@ -92,7 +115,11 @@ class Node
 
                     announce @url
                 rescue => e
+                    p grid_peers
                     p e
+                    e.backtrace.each do |l|
+                        p l
+                    end
                 end
             end
         end
@@ -100,8 +127,6 @@ class Node
         $stdout.puts 'Node ready.'
 
         log_updated_peers
-
-        run if !options.include?(:run) || options[:run]
     end
 
     def attach_addon( name, service, options = {} )
@@ -231,10 +256,14 @@ class Node
         true
     end
 
-    def run
+    def start
         # @server.reactor.ensure_reactor_running
         $stdout.puts 'Running'
         @server.start
+
+        q = Queue.new
+        self.class.when_ready( @url) { q << Client.new( @url ) }
+        q.pop
     rescue => e
         $stderr.puts e
         $stderr.puts "Could not start server"

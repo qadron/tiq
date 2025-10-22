@@ -5,8 +5,9 @@ describe 'Tiq::Node::Addon' do
     let( :peer ) { @peer ||= Tiq::Node.new( url: 'localhost:9998', peer: 'localhost:9999' ) }
 
     before( :each ) do
-        node
-        peer
+        node.start
+        sleep 1
+        peer.start
         sleep 0.1
     end
 
@@ -15,7 +16,7 @@ describe 'Tiq::Node::Addon' do
         @peer = nil
         @node.shutdown
         @node = nil
-        sleep 1
+        sleep 2
     end
 
     it 'attaches and calls an addon' do
