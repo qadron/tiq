@@ -2,7 +2,6 @@ require 'set'
 require 'yaml'
 require_relative 'node/data'
 require_relative 'node/addon'
-require_relative 'channel'
 require_relative 'client'
 
 module Tiq
@@ -34,7 +33,7 @@ class Node
     INTERVAL_PING = 5
 
     attr_reader :url
-    attr_reader :data
+    attr_reader :channel
     attr_reader :reactor
     attr_reader :server
 
@@ -75,8 +74,8 @@ class Node
 
         @reactor.run_in_thread if !@reactor.running?
 
-        @data = Data.new( self )
-        @server.add_handler( 'data', @data )
+        @channel = Tiq::Node::Data.new( self )
+        @server.add_handler( 'data', @channel )
 
         @reactor.on_error do |_, e|
             $stderr.puts "Reactor: #{e}"
@@ -181,14 +180,14 @@ class Node
         $stdout.puts "Adding peer: #{node_url}"
         @peers << node_url
 
-        connect_to_peer( node_url ){ update_data( @data.to_h ) }
+        connect_to_peer( node_url ){ update_channel( @channel.to_h ) }
 
         log_updated_peers
         true
     end
 
-    def update_data( data )
-        @data.update( data )
+    def update_channel( channel )
+        @channel.update( channel )
         nil
     end
 

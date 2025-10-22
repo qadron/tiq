@@ -119,7 +119,7 @@ class Data
 
     def connect_to_peer( url, options = {} )
         @rpc_clients      ||= {}
-        @rpc_clients[url] ||= Tiq::Channel.new( url, options )
+        @rpc_clients[url] ||= Tiq::Client.new( url, options.merge( handler: :data ) )
     end
 
     def sanitize_key( k )
