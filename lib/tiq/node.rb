@@ -101,7 +101,7 @@ class Node
 
         log_updated_peers
 
-        # run if !options.include?(:run) || options[:run]
+        run if !options.include?(:run) || options[:run]
     end
 
     def attach_addon( name, service, options = {} )
