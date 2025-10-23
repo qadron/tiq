@@ -77,6 +77,8 @@ class Node
         @channel = Tiq::Node::Data.new( self, name: 'data' )
         @server.add_handler( 'data', @channel )
 
+        @group_handlers = {}
+
         @reactor.on_error do |_, e|
             $stderr.puts "Reactor: #{e}"
 
@@ -156,8 +158,8 @@ class Node
     end
 
     def create_group_handler( name, broadcast = true, &block )
-        h = Tiq::Node::Data.new( self, name: name.to_s )
-        @server.add_handler( name.to_s, h )
+        @group_handlers[name.to_s] = Tiq::Node::Data.new( self, name: name.to_s )
+        @server.add_handler( name.to_s, @group_handlers[name.to_s] )
 
         if !broadcast
             block.call
@@ -184,6 +186,14 @@ class Node
     e.backtrace.each do |l|
       p l
     end
+    end
+
+    def remove_group_handler( name )
+        @group_handlers.delete name.to_s
+    end
+
+    def group_handlers
+        @group_handlers.keys
     end
 
     # @return   [Boolean]
