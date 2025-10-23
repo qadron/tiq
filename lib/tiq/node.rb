@@ -173,11 +173,7 @@ class Node
                 p e
             end
         }
-        after = proc {
-            p 37367839389389
-        }
-
-        @reactor.create_iterator( @peers, 20 ).each( each, after )
+        @reactor.create_iterator( @peers, 20 ).each( each )
         nil
     rescue => e
     p e
