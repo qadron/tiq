@@ -168,9 +168,7 @@ class Node
 
         each = proc { |peer, iterator|
             begin
-                p 1818
                 connect_to_peer( peer ).create_group_handler( name, false ) { |_, i2| iterator.next; i2.next }
-                p 5252
             rescue => e
                 p e
             end
