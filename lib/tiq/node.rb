@@ -159,11 +159,11 @@ class Node
 
     def create_group_handler( name, broadcast = true, &block )
         name = name.to_s
-        @group_handlers[name.to_s] = Tiq::Node::Data.new( self, name: name.to_s )
-        @server.add_handler( name.to_s, @group_handlers[name.to_s] )
+        @group_handlers[name] = Tiq::Node::Data.new( self, handler: name )
+        @server.add_handler( name, @group_handlers[name] )
 
-        self.class.define_method name.to_s do
-            @group_handlers[name.to_s]
+        self.class.define_method name do
+            @group_handlers[name]
         end
 
         if !broadcast

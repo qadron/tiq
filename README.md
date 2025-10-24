@@ -133,7 +133,7 @@ Tiq::Addon "localhost:9999", :poll, 'ping' do
 end
 ```
 
-### Data
+### Channel Shared Data
 
 Data can be shared across _Nodes_ by means of broadcasting upon
 change - optional.
@@ -157,7 +157,23 @@ end
 
 node_1.data.set :my_signal, 'tada!'
 sleep 1
+```
 
+#### Custom groups
+
+```ruby
+require 'tiq'
+
+n1 = Tiq::Node.new( url: "localhost:9999" ).start
+n2 = Tiq::Node.new( url: "localhost:9998", peer: 'localhost:9999' ).start
+
+# Add as many groups/channels/shared-data structures as you want.
+n1.create_group_handler 'agents'
+
+n1.agents.set :a1, 99
+sleep 1
+
+p n2.agents.get :a1
 ```
 
 ## Installation
