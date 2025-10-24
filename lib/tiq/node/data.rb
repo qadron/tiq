@@ -10,7 +10,7 @@ class Data
         @on_set_cb    = {}
         @on_delete_cb = {}
 
-        @handler = (options[:name] || 'data').to_s
+        @handler = (options[:handler] || 'data').to_s
         @node    = node
     end
 
