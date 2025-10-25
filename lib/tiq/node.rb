@@ -74,10 +74,10 @@ class Node
 
         @reactor.run_in_thread if !@reactor.running?
 
-        @channel = Tiq::Node::Data.new( self, handler: 'data' )
-        @server.add_handler( 'data', @channel )
+        @channel = Tiq::Node::Data.new( self, handler: 'channel' )
+        @server.add_handler( 'channel', @channel )
 
-        @group_handlers = {}
+        @channels = {}
 
         @reactor.on_error do |_, e|
             $stderr.puts "Reactor: #{e}"
@@ -157,13 +157,13 @@ class Node
         @addons.delete name
     end
 
-    def create_group_handler( name, broadcast = true, &block )
+    def create_channel( name, broadcast = true, &block )
         name = name.to_s
-        @group_handlers[name] = Tiq::Node::Data.new( self, handler: name )
-        @server.add_handler( name, @group_handlers[name] )
+        @channels[name] = Tiq::Node::Data.new( self, handler: name )
+        @server.add_handler( name, @channels[name] )
 
         self.class.define_method name do
-            @group_handlers[name]
+            @channels[name]
         end
 
         if !broadcast
@@ -173,7 +173,7 @@ class Node
 
         each = proc { |peer, iterator|
             begin
-                connect_to_peer( peer ).create_group_handler( name, false ) { |_, i2| iterator.next; i2.next }
+                connect_to_peer( peer ).create_channel( name, false ) { |_, i2| iterator.next; i2.next }
             rescue => e
                 p e
             end
@@ -187,12 +187,12 @@ class Node
     end
     end
 
-    def remove_group_handler( name )
-        @group_handlers.delete name.to_s
+    def remove_channel( name )
+        @channels.delete name.to_s
     end
 
-    def group_handlers
-        @group_handlers.keys
+    def channels
+        @channels.keys
     end
 
     # @return   [Boolean]

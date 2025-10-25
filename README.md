@@ -97,7 +97,7 @@ end
 # Set up initial Node, the start of the cluster.
 node_1  = MyNode.new( url: "localhost:9999" )
 node_2  = MySecondNode.new( url: "localhost:9998", peer: 'localhost:9999' )
-channel = MyChannelNode.new( url: "localhost:9997", peer: 'localhost:9999' ).data
+channel = MyChannelNode.new( url: "localhost:9997", peer: 'localhost:9999' ).channel
 sleep 1
 
 channel.on_set :my_signal do |value|
@@ -106,7 +106,6 @@ end
 
 node_1.data.set :my_signal, 'tada!'
 sleep 1
-
 ```
 
 ### Add-ons
@@ -151,11 +150,11 @@ node_2 = MySecondNode.new( url: "localhost:9998", peer: 'localhost:9999' )
 
 sleep 1
 
-node_2.data.on_set :my_signal do |value|
+node_2.channel.on_set :my_signal do |value|
     p "#{:on_set} - #{value}"
 end
 
-node_1.data.set :my_signal, 'tada!'
+node_1.channel.set :my_signal, 'tada!'
 sleep 1
 ```
 
@@ -168,7 +167,7 @@ n1 = Tiq::Node.new( url: "localhost:9999" ).start
 n2 = Tiq::Node.new( url: "localhost:9998", peer: 'localhost:9999' ).start
 
 # Add as many groups/channels/shared-data structures as you want.
-n1.create_group_handler 'agents'
+n1.create_channel 'agents'
 
 n1.agents.set :a1, 99
 sleep 1
