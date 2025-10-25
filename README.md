@@ -44,7 +44,7 @@ and instantiate it with a URL to bind to.
 cass MyNode < Tiq::Node
 end
 
-node = MyNode.new( url: "localhost:9999" )
+node = MyNode.new( url: "localhost:9999" ).start
 ```
 
 ### Cluster
@@ -58,7 +58,7 @@ Any existing _Node_ would do.
 class MySecondNode < Tiq::Node
 end
 
-node_2 = MySecondNode.new( url: "localhost:9998", peer: 'localhost:9999' )
+node_2 = MySecondNode.new( url: "localhost:9998", peer: 'localhost:9999' ).start
 ```
 
 ### Client
@@ -66,7 +66,7 @@ node_2 = MySecondNode.new( url: "localhost:9998", peer: 'localhost:9999' )
 `Tiq::Client` offers a _Client_ to enable _Node_/User communications.
 
 ```ruby
-client = MyClient.new( "localhost:9999" )
+client = MyClient.new( "localhost:9999" ).start
 
 # Issue calls on the server side and get us the responses.
 # Client will return `true`.
@@ -95,9 +95,9 @@ class MyChannelNode < Tiq::Node
 end
 
 # Set up initial Node, the start of the cluster.
-node_1  = MyNode.new( url: "localhost:9999" )
-node_2  = MySecondNode.new( url: "localhost:9998", peer: 'localhost:9999' )
-channel = MyChannelNode.new( url: "localhost:9997", peer: 'localhost:9999' ).channel
+node_1  = MyNode.new( url: "localhost:9999" ).start
+node_2  = MySecondNode.new( url: "localhost:9998", peer: 'localhost:9999' ).start
+channel = MyChannelNode.new( url: "localhost:9997", peer: 'localhost:9999' ).start.channel
 sleep 1
 
 channel.on_set :my_signal do |value|
@@ -119,7 +119,7 @@ class MyNode < Tiq::Node
 end
 
 # Set up initial Node.
-node_1 = MyNode.new( url: "localhost:9999" )
+node_1 = MyNode.new( url: "localhost:9999" ).start
 
 # Add a service to the node, called :poll.
 Tiq::Addon::Attach node_1, :poll do |arguments = nil|
@@ -145,8 +145,8 @@ class MySecondNode < Tiq::Node
 end
 
 # Set up initial Node, the start of the cluster.
-node_1 = MyNode.new( url: "localhost:9999" )
-node_2 = MySecondNode.new( url: "localhost:9998", peer: 'localhost:9999' )
+node_1 = MyNode.new( url: "localhost:9999" ).start
+node_2 = MySecondNode.new( url: "localhost:9998", peer: 'localhost:9999' ).start
 
 sleep 1
 
