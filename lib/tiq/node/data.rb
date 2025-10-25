@@ -10,7 +10,7 @@ class Data
         @on_set_cb    = {}
         @on_delete_cb = {}
 
-        @handler = (options[:handler] || 'data').to_s
+        @handler = (options[:handler] || 'channel').to_s
         @node    = node
     end
 
