@@ -127,9 +127,11 @@ Tiq::Addon::Attach node_1, :poll do |arguments = nil|
 end
 
 # Interact with the service via a Client.
-Tiq::Addon "localhost:9999", :poll, 'ping' do
+Tiq::Addon "localhost:9999", :poll, 'ping' do |r|
     puts "CLIENT: #{r}"
 end
+
+sleep 1
 ```
 
 ### Channel Shared Data

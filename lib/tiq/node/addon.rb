@@ -23,13 +23,13 @@ class Node
     class Addon
 
         attr_reader :node
-        attr_reader :data
+        attr_reader :channel
         attr_reader :options
 
         def initialize( node, payload, options = {} )
             @node    = node
             @options = options
-            @data    = @node.data
+            @channel = @node.channel
             @payload = payload
         end
 
