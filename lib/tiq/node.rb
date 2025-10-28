@@ -130,15 +130,17 @@ class Node
     end
 
     def attach_addon( name, service, options = {} )
-        if @addons[name.to_s]
+        name = name.to_s
+        if @addons[name]
             fail "Add-on already registered with name: #{name}"
         end
-        @addons[name.to_s] = Node::Addon.new( self, service, options )
+        @addons[name] = Node::Addon.new( self, service, options )
         nil
     end
 
     def call_addon( name, *arguments )
-        if !@addons[name.to_s]
+        name = name.to_s
+        if !@addons[name]
             fail "Add-on not attached with name: #{name}"
         end
 
@@ -150,7 +152,8 @@ class Node
     end
 
     def dettach_addon( name )
-        if !@addons[name.to_s]
+        name = name.to_s
+        if !@addons[name]
             fail "Add-on not attached with name: #{name}"
         end
 
