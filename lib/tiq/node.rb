@@ -1,6 +1,6 @@
 require 'set'
 require 'yaml'
-require_relative 'node/data'
+require_relative 'node/channel'
 require_relative 'node/addon'
 require_relative 'client'
 
@@ -74,7 +74,7 @@ class Node
 
         @reactor.run_in_thread if !@reactor.running?
 
-        @channel = Tiq::Node::Data.new( self, handler: 'channel' )
+        @channel = Tiq::Node::Channel.new( self, handler: 'channel' )
         @server.add_handler( 'channel', @channel )
 
         @channels = {}

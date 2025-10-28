@@ -1,6 +1,6 @@
 module Tiq
 class Node
-class Data
+class Channel
 
     CONCURRENCY = 20
 
