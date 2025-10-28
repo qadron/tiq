@@ -104,7 +104,7 @@ channel.on_set :my_signal do |value|
     p "#{:on_set} - #{value}"
 end
 
-node_1.data.set :my_signal, 'tada!'
+node_1.channel.set :my_signal, 'tada!'
 sleep 1
 ```
 
