@@ -7,7 +7,7 @@
 =end
 
 Gem::Specification.new do |s|
-      require File.expand_path( File.dirname( __FILE__ ) ) + '/lib/tiq'
+      require File.expand_path( File.dirname( __FILE__ ) ) + '/lib/tiq/version'
 
       s.name              = 'tiq'
       s.version           = Tiq::VERSION
