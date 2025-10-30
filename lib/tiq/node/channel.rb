@@ -87,9 +87,14 @@ class Channel
     def call_on_set( k, v )
         k = sanitize_key( k )
 
-        # p "#{@node} call_on_set #{k} 2"
-        # p @on_set_cb
-        # p "--- PEERS #{@node.peers}"
+        # Catch-all!
+        if @on_set_cb['']
+            @on_set_cb.each do |_, cbs|
+                cbs.each do |cb|
+                    cb.call k, v
+                end
+            end
+        end
 
         if @on_set_cb[k]
             @on_set_cb[k].each do |cb|
@@ -103,6 +108,15 @@ class Channel
     def call_on_delete( k )
         k = sanitize_key( k )
         return if !@on_delete_cb[k]
+
+        # Catch-all!
+        if @on_delete_cb['']
+            @on_delete_cb.each do |k, cbs|
+                cbs.each do |cb|
+                    cb.call k, v
+                end
+            end
+        end
 
         @on_delete_cb[k].each do |cb|
             cb.call k
