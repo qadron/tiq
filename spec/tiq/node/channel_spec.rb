@@ -1,12 +1,12 @@
 require 'spec_helper'
 
 describe Tiq::Node::Channel do
-    let( :node ) { @node ||= Tiq::Node.new( url: 'localhost:9999' ) }
-    let( :peer ) { @peer ||= Tiq::Node.new( url: 'localhost:9998', peer: 'localhost:9999' ) }
+    let( :node ) { @node ||= Tiq::Node.new( url: '0.0.0.0:9999' ) }
+    let( :peer ) { @peer ||= Tiq::Node.new( url: '0.0.0.0:9998', peer: '0.0.0.0:9999' ) }
 
     before( :each ) do
-        node
-        peer
+        node.start
+        peer.start
         sleep 0.1
     end
 
