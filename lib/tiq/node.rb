@@ -162,7 +162,7 @@ class Node
 
     def create_channel( name, broadcast = true, &block )
         name = name.to_s
-        @channels[name] = Tiq::Node::Data.new( self, handler: name )
+        @channels[name] = Tiq::Node::Channel.new( self, handler: name )
         @server.add_handler( name, @channels[name] )
 
         self.class.define_method name do
