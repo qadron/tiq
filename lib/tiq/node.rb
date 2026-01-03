@@ -303,7 +303,7 @@ class Node
         @server.start
 
         q = Queue.new
-        self.class.when_ready( @url) { q << Client.new( @url ) }
+        self.class.when_ready( @url) { q << nil }
         q.pop
 
         self
