@@ -5,10 +5,11 @@ module Tiq
 class Client < Toq::Client
 
     def initialize( url, options = {} )
-        @handler = (options[:handler] || 'node').to_s
+        @serializer = options[:serializer] || YAML
+        @handler    = (options[:handler] || 'node').to_s
 
         host, port = url.split( ':' )
-        super( options.merge( host: host, port: port.to_i ) )
+        super( options.merge( host: host, port: port.to_i, serializer: @serializer ) )
     end
 
     def method_missing( method, *args, &block )

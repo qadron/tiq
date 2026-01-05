@@ -22,7 +22,6 @@ class Node
                     end
 
                     client.close
-
                     block.call
                 end
             end
@@ -46,8 +45,9 @@ class Node
     #
     # @param    [Cuboid::Options]    options
     def initialize( options )
-        @options = options
-        @url     = @options[:url]
+        @options    = options
+        @url        = @options[:url]
+        @serializer = @options[:serializer] || YAML
 
         $stdout.puts 'Initializing node...'
 
@@ -64,7 +64,7 @@ class Node
         options[:host] ||= host || 'localhost'
         options[:port] ||= port || 9999
 
-        @server  = Toq::Server.new( options.merge( host: options[:host], port: options[:port] ) )
+        @server  = Toq::Server.new( options.merge( host: options[:host], port: options[:port], serializer: @serializer  ) )
         @reactor = @server.reactor
         @server.add_async_check do |method|
             # methods that expect a block are async
@@ -303,7 +303,7 @@ class Node
         @server.start
 
         q = Queue.new
-        self.class.when_ready( @url) { q << nil }
+        self.class.when_ready( @url ) { q << nil }
         q.pop
 
         self
@@ -385,7 +385,7 @@ class Node
 
     def connect_to_peer( url, options = {} )
         @rpc_clients      ||= {}
-        @rpc_clients[url] ||= Tiq::Client.new( url, options )
+        @rpc_clients[url] ||= Tiq::Client.new( url, options.merge( serializer: @serializer ) )
     end
 end
 end
