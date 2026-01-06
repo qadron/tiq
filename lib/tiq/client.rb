@@ -5,6 +5,7 @@ module Tiq
 class Client < Toq::Client
 
     def initialize( url, options = {} )
+        options = options.symbolize_keys
         @serializer = options[:serializer] || YAML
         @handler    = (options[:handler] || 'node').to_s
 
