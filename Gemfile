@@ -3,7 +3,7 @@
 source "https://rubygems.org"
 
 gem "raktr"
-gem "toq", path: '../toq'
+gem "toq"
 gem "msgpack"
 
 # gem "rails"

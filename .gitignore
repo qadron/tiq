@@ -1,3 +1,5 @@
 tmp/
 .gitignore
 test/
+vendor/bundle
+.bundle
