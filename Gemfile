@@ -9,4 +9,6 @@ gem "msgpack"
 # gem "rails"
 gem 'rspec'
 
+gem 'awesome_print'
+
 gemspec

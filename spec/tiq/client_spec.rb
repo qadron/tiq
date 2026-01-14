@@ -67,7 +67,7 @@ describe Tiq::Client do
 
     describe 'addon calls' do
         before( :each ) do
-            node.attach_addon( 'test', proc { |arg| "echo: #{arg}" } )
+            node.attach_addon( 'test', proc { |_, arg| "echo: #{arg}" } )
         end
 
         it 'calls addon through client' do
@@ -99,14 +99,7 @@ describe Tiq::Client do
     describe 'error handling' do
         it 'handles connection to non-existent node' do
             bad_client = Tiq::Client.new( '0.0.0.0:7777', client_max_retries: 1 )
-            result = nil
-            bad_client.alive? do |r|
-                result = r
-            end
-            sleep 1
-            expect( result ).to respond_to :rpc_exception?
-            expect( result.rpc_exception? ).to be true
-            bad_client.close
+            expect { bad_client.alive? }.to raise_error Toq::Exceptions::ConnectionError
         end
     end
 end

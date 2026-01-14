@@ -1,3 +1,4 @@
+require 'awesome_print'
 require_relative '../lib/tiq'
 
 RSpec.configure do |config|

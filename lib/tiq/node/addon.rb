@@ -25,16 +25,18 @@ class Node
         attr_reader :node
         attr_reader :channel
         attr_reader :options
+        attr_reader :reactor
 
         def initialize( node, payload, options = {} )
             @node    = node
+            @reactor = node.reactor
             @options = options
             @channel = @node.channel
             @payload = payload
         end
 
         def call( *arguments, &block )
-            instance_eval { @payload.call *arguments, &block }
+            instance_eval { @payload.call *[self, *arguments].flatten, &block }
         end
 
         # @return   [Server::node::Node]
@@ -57,15 +59,19 @@ class Node
         #
         # @param    [Block]  block
         #   Operation to defer.
-        def defer( operation = nil, callback = nil, &block )
-            Thread.new( *[operation, callback].compact, &block )
+        def defer( operation, callback = nil )
+            Thread.new do
+                r = operation.call( self )
+                callback.call( r ) if callback
+            end
+            nil
         end
 
         # Runs a block as soon as possible in the Reactor loop.
         #
         # @param    [Block] block
         def run_asap( &block )
-            Raktr.global.next_tick( &block )
+            @reactor.next_tick( &block )
         end
 
         # @param    [Array]    list
@@ -73,7 +79,7 @@ class Node
         # @return   [Raktr::Iterator]
         #   Iterator for the provided array.
         def iterator_for( list, max_concurrency = 10 )
-            Raktr.global.create_iterator( list, max_concurrency )
+            @reactor.create_iterator( list, max_concurrency )
         end
 
         # Connects to a node by `url`

@@ -3,6 +3,7 @@ require 'spec_helper'
 describe Tiq::Node do
     let( :node ) { @node ||= Tiq::Node.new( url: '0.0.0.0:9999' ) }
     let( :peer ) { @peer ||= Tiq::Node.new( url: '0.0.0.0:9998', peer: '0.0.0.0:9999' ) }
+    let( :node2 ) { @node2 ||= Tiq::Node.new( url: '0.0.0.0:8999' ) }
 
     before( :each ) do
         node.start
@@ -43,7 +44,7 @@ describe Tiq::Node do
         end
 
         it 'returns false if node has no peers' do
-            expect( node.grid_member? ).to be false
+            expect( node2.grid_member? ).to be false
         end
     end
 
@@ -150,7 +151,7 @@ describe Tiq::Node do
 
     describe '#call_addon' do
         it 'calls an attached addon' do
-            node.attach_addon( 'echo', proc { |arg| arg } )
+            node.attach_addon( 'echo', proc { |_, arg| arg } )
             result = node.call_addon( 'echo', 'hello' )
             expect( result ).to eq 'hello'
         end

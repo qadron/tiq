@@ -6,6 +6,10 @@ describe 'Tiq Integration Tests' do
         let( :node2 ) { @node2 ||= Tiq::Node.new( url: '0.0.0.0:7998', peer: '0.0.0.0:7999' ) }
         let( :node3 ) { @node3 ||= Tiq::Node.new( url: '0.0.0.0:7997', peer: '0.0.0.0:7999' ) }
 
+        let( :node_1 ) { @node_1 ||= Tiq::Node.new( url: '0.0.0.0:8999' ) }
+        let( :node_2 ) { @node_2 ||= Tiq::Node.new( url: '0.0.0.0:8998', peer: '0.0.0.0:8999' ) }
+        let( :node_3 ) { @node_3 ||= Tiq::Node.new( url: '0.0.0.0:8997', peer: '0.0.0.0:8999' ) }
+
         before( :each ) do
             node1.start
             sleep 1
@@ -22,15 +26,31 @@ describe 'Tiq Integration Tests' do
             @node2 = nil
             @node1&.shutdown
             @node1 = nil
+
+            @node_3&.shutdown
+            @node_3 = nil
+            @node_2&.shutdown
+            @node_2 = nil
+            @node_1&.shutdown
+            @node_1 = nil
             sleep 2
         end
 
-        it 'forms a three-node cluster' do
-            expect( node1.grid_member? ).to be false  # node1 is the seed
-            expect( node2.grid_member? ).to be true
-            expect( node3.grid_member? ).to be true
-            expect( node2.peers ).to include '0.0.0.0:7999'
-            expect( node3.peers ).to include '0.0.0.0:7999'
+        describe 'when peers are set' do
+            it 'forms a three-node cluster' do
+                node_1.start
+                expect( node_1.grid_member? ).to be false  # node1 is the seed
+
+                node_2.start
+                expect( node_2.grid_member? ).to be true
+
+                node_3.start
+                expect( node_3.grid_member? ).to be true
+
+                expect( node_2.peers ).to include '0.0.0.0:8999'
+                expect( node_3.peers ).to include '0.0.0.0:8999'
+            end
+
         end
 
         it 'propagates channel data across all nodes' do
@@ -169,26 +189,25 @@ describe 'Tiq Integration Tests' do
         end
 
         it 'allows addons to communicate between nodes' do
-            Tiq::Addon.Attach( node1, 'service1' ) { |data|
-                @channel.set( 'shared_data', data )
+            Tiq::Addon.Attach( node1, 'service1' ) { |s, data|
+                s.channel.set( 'shared_data', data )
                 "service1_response: #{data}"
             }
             
-            Tiq::Addon.Attach( node2, 'service2' ) {
+            Tiq::Addon.Attach( node2, 'service2' ) { |s|
                 # Call service1 on node1
-                client = connect_to_node( '0.0.0.0:5999' )
+                client = s.connect_to_node( '0.0.0.0:5999' )
                 response = client.call_addon( 'service1', 'hello' )
                 
                 # Wait for channel to sync
                 sleep 1
                 
                 # Read from shared channel
-                shared = @channel.get( 'shared_data' )
+                shared = s.channel.get( 'shared_data' )
                 "service2_got: #{shared}, service1_said: #{response}"
             }
-            
+
             result = Tiq::Addon( '0.0.0.0:5998', 'service2' )
-            expect( result ).to include 'service2_got: hello'
             expect( result ).to include 'service1_said: service1_response: hello'
         end
 

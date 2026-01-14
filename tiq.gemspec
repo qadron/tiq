@@ -31,4 +31,5 @@ description
 
       s.add_dependency "msgpack"
       s.add_dependency "toq"
+      s.add_dependency "awesome_print"
 end
