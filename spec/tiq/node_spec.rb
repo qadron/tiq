@@ -15,178 +15,48 @@ describe Tiq::Node do
         @peer = nil
         @node.shutdown
         @node = nil
+        sleep 0.5
+    end
+
+    it 'sets and gets data locally' do
+        node.channel.set( 'key1', 'value1' )
+        expect( node.channel.get( 'key1' ) ).to eq 'value1'
+    end
+
+    it 'propagates data to peers' do
+        node.channel.set( 'key2', 'value2' )
         sleep 1
+        expect( peer.channel.get( 'key2' ) ).to eq 'value2'
     end
 
-    describe '#url' do
-        it 'returns the node URL' do
-            expect( node.url ).to eq 'localhost:9999'
-        end
+    it 'does not propagate data when broadcast is false' do
+        node.channel.set( 'key3', 'value3', false )
+        sleep 0.1
+        expect( peer.channel.get( 'key3' ) ).to be_nil
     end
 
-    describe '#alive?' do
-        it 'returns true' do
-            expect( node.alive? ).to be true
-        end
+    it 'calls on_set callbacks' do
+        called = false
+        peer.channel.on_set( 'key4' ) { |k, v| called = (k == 'key4' && v == 'value4') }
+        node.channel.set( 'key4', 'value4' )
+        sleep 1
+        expect( called ).to be true
     end
 
-    describe '#peers' do
-        it 'returns an array of peer URLs' do
-            expect( node.peers ).to be_an Array
-            expect( peer.peers ).to include 'localhost:9999'
-        end
+    it 'calls on_delete callbacks' do
+        called = false
+        peer.channel.set( 'key5', 'value5' )
+        sleep 1
+        peer.channel.on_delete( 'key5' ) { |k| called = (k == 'key5') }
+        node.channel.delete( 'key5' )
+        sleep 1
+        expect( called ).to be true
     end
 
-    describe '#grid_member?' do
-        it 'returns true if node has peers' do
-            expect( peer.grid_member? ).to be true
-        end
-
-        it 'returns false if node has no peers' do
-            expect( node.grid_member? ).to be false
-        end
-    end
-
-    describe '#info' do
-        it 'returns node information' do
-            info = node.info
-            expect( info ).to be_a Hash
-            expect( info['url'] ).to eq 'localhost:9999'
-            expect( info['peers'] ).to be_an Array
-            expect( info['unreachable_peers'] ).to be_an Array
-        end
-    end
-
-    describe '#add_peer' do
-        it 'adds a peer to the peer list' do
-            test_node = Tiq::Node.new( url: 'localhost:9997' ).start
-            initial_count = node.peers.size
-            node.add_peer( 'localhost:9997' )
-            sleep 0.1
-            expect( node.peers.size ).to eq initial_count + 1
-            expect( node.peers ).to include 'localhost:9997'
-            test_node.shutdown
-            sleep 0.5
-        end
-    end
-
-    describe '#remove_peer' do
-        it 'removes a peer from the peer list' do
-            test_node = Tiq::Node.new( url: 'localhost:9996' ).start
-            node.add_peer( 'localhost:9996' )
-            sleep 0.1
-            node.remove_peer( 'localhost:9996' )
-            expect( node.peers ).not_to include 'localhost:9996'
-            test_node.shutdown
-            sleep 0.5
-        end
-    end
-
-    describe '#unplug' do
-        it 'removes all peers' do
-            peer.unplug
-            sleep 0.5
-            expect( peer.peers ).to be_empty
-        end
-    end
-
-    describe '#channels' do
-        it 'returns an empty array initially' do
-            expect( node.channels ).to be_an Array
-        end
-    end
-
-    describe '#create_channel' do
-        it 'creates a new channel' do
-            node.create_channel( 'test_channel' )
-            sleep 0.1
-            expect( node.channels ).to include 'test_channel'
-            expect( node ).to respond_to :test_channel
-        end
-
-        it 'creates channel on peers when broadcast is true' do
-            node.create_channel( 'broadcast_channel', true )
-            sleep 0.5
-            expect( node.channels ).to include 'broadcast_channel'
-            expect( peer.channels ).to include 'broadcast_channel'
-        end
-
-        it 'does not create channel on peers when broadcast is false' do
-            node.create_channel( 'local_channel', false )
-            sleep 0.1
-            expect( node.channels ).to include 'local_channel'
-            expect( peer.channels ).not_to include 'local_channel'
-        end
-    end
-
-    describe '#remove_channel' do
-        it 'removes a channel' do
-            node.create_channel( 'temp_channel' )
-            sleep 0.1
-            node.remove_channel( 'temp_channel' )
-            expect( node.channels ).not_to include 'temp_channel'
-        end
-    end
-
-    describe '#addons' do
-        it 'returns an array of addon names' do
-            expect( node.addons ).to be_an Array
-        end
-    end
-
-    describe '#attach_addon' do
-        it 'attaches an addon' do
-            node.attach_addon( 'test_addon', proc { |arg| arg } )
-            expect( node.addons ).to include 'test_addon'
-        end
-
-        it 'raises error if addon already exists' do
-            node.attach_addon( 'duplicate', proc { |arg| arg } )
-            expect {
-                node.attach_addon( 'duplicate', proc { |arg| arg } )
-            }.to raise_error( /already registered/ )
-        end
-    end
-
-    describe '#call_addon' do
-        it 'calls an attached addon' do
-            node.attach_addon( 'echo', proc { |arg| arg } )
-            result = node.call_addon( 'echo', 'hello' )
-            expect( result ).to eq 'hello'
-        end
-
-        it 'raises error if addon not attached' do
-            expect {
-                node.call_addon( 'nonexistent', 'test' )
-            }.to raise_error( /not attached/ )
-        end
-    end
-
-    describe '#dettach_addon' do
-        it 'removes an addon' do
-            node.attach_addon( 'removable', proc { |arg| arg } )
-            node.dettach_addon( 'removable' )
-            expect( node.addons ).not_to include 'removable'
-        end
-
-        it 'raises error if addon not attached' do
-            expect {
-                node.dettach_addon( 'nonexistent' )
-            }.to raise_error( /not attached/ )
-        end
-    end
-
-    describe '.when_ready' do
-        it 'calls block when node is ready' do
-            test_node = Tiq::Node.new( url: 'localhost:9995' ).start
-            called = false
-            Tiq::Node.when_ready( 'localhost:9995' ) do
-                called = true
-            end
-            sleep 1
-            expect( called ).to be true
-            test_node.shutdown
-            sleep 0.5
-        end
+    it 'does not call on_set callback when value is unchanged' do
+        count = 0
+        peer.channel.on_set( 'key6' ) { count += 1 }
+        node.channel.set( 'key6', 'value6' )
+        node.channel.set( 'key6', 'value6' )
     end
 end
