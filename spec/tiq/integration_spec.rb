@@ -2,9 +2,9 @@ require 'spec_helper'
 
 describe 'Tiq Integration Tests' do
     describe 'Multi-node cluster' do
-        let( :node1 ) { @node1 ||= Tiq::Node.new( url: 'localhost:7999' ) }
-        let( :node2 ) { @node2 ||= Tiq::Node.new( url: 'localhost:7998', peer: 'localhost:7999' ) }
-        let( :node3 ) { @node3 ||= Tiq::Node.new( url: 'localhost:7997', peer: 'localhost:7999' ) }
+        let( :node1 ) { @node1 ||= Tiq::Node.new( url: '0.0.0.0:7999' ) }
+        let( :node2 ) { @node2 ||= Tiq::Node.new( url: '0.0.0.0:7998', peer: '0.0.0.0:7999' ) }
+        let( :node3 ) { @node3 ||= Tiq::Node.new( url: '0.0.0.0:7997', peer: '0.0.0.0:7999' ) }
 
         before( :each ) do
             node1.start
@@ -29,8 +29,8 @@ describe 'Tiq Integration Tests' do
             expect( node1.grid_member? ).to be false  # node1 is the seed
             expect( node2.grid_member? ).to be true
             expect( node3.grid_member? ).to be true
-            expect( node2.peers ).to include 'localhost:7999'
-            expect( node3.peers ).to include 'localhost:7999'
+            expect( node2.peers ).to include '0.0.0.0:7999'
+            expect( node3.peers ).to include '0.0.0.0:7999'
         end
 
         it 'propagates channel data across all nodes' do
@@ -88,15 +88,15 @@ describe 'Tiq Integration Tests' do
             info2 = node2.info
             info3 = node3.info
             
-            expect( info1['url'] ).to eq 'localhost:7999'
-            expect( info2['url'] ).to eq 'localhost:7998'
-            expect( info3['url'] ).to eq 'localhost:7997'
+            expect( info1['url'] ).to eq '0.0.0.0:7999'
+            expect( info2['url'] ).to eq '0.0.0.0:7998'
+            expect( info3['url'] ).to eq '0.0.0.0:7997'
         end
     end
 
     describe 'Node failure and recovery' do
-        let( :node1 ) { @node1 ||= Tiq::Node.new( url: 'localhost:6999' ) }
-        let( :node2 ) { @node2 ||= Tiq::Node.new( url: 'localhost:6998', peer: 'localhost:6999' ) }
+        let( :node1 ) { @node1 ||= Tiq::Node.new( url: '0.0.0.0:6999' ) }
+        let( :node2 ) { @node2 ||= Tiq::Node.new( url: '0.0.0.0:6998', peer: '0.0.0.0:6999' ) }
 
         before( :each ) do
             node1.start
@@ -123,7 +123,7 @@ describe 'Tiq Integration Tests' do
             
             # Node1 should have marked node2 as unreachable
             info = node1.info
-            expect( info['unreachable_peers'] ).to include 'localhost:6998'
+            expect( info['unreachable_peers'] ).to include '0.0.0.0:6998'
         end
 
         it 'handles peer comeback' do
@@ -133,10 +133,10 @@ describe 'Tiq Integration Tests' do
             
             # Verify node2 is marked as dead
             info = node1.info
-            expect( info['unreachable_peers'] ).to include 'localhost:6998'
+            expect( info['unreachable_peers'] ).to include '0.0.0.0:6998'
             
             # Restart node2
-            @node2 = Tiq::Node.new( url: 'localhost:6998', peer: 'localhost:6999' )
+            @node2 = Tiq::Node.new( url: '0.0.0.0:6998', peer: '0.0.0.0:6999' )
             @node2.start
             
             # Wait for comeback check interval
@@ -144,14 +144,14 @@ describe 'Tiq Integration Tests' do
             
             # Node1 should have detected node2 is back
             info = node1.info
-            expect( info['peers'] ).to include 'localhost:6998'
-            expect( info['unreachable_peers'] ).not_to include 'localhost:6998'
+            expect( info['peers'] ).to include '0.0.0.0:6998'
+            expect( info['unreachable_peers'] ).not_to include '0.0.0.0:6998'
         end
     end
 
     describe 'Complex addon scenarios' do
-        let( :node1 ) { @node1 ||= Tiq::Node.new( url: 'localhost:5999' ) }
-        let( :node2 ) { @node2 ||= Tiq::Node.new( url: 'localhost:5998', peer: 'localhost:5999' ) }
+        let( :node1 ) { @node1 ||= Tiq::Node.new( url: '0.0.0.0:5999' ) }
+        let( :node2 ) { @node2 ||= Tiq::Node.new( url: '0.0.0.0:5998', peer: '0.0.0.0:5999' ) }
 
         before( :each ) do
             node1.start
@@ -176,7 +176,7 @@ describe 'Tiq Integration Tests' do
             
             Tiq::Addon.Attach( node2, 'service2' ) {
                 # Call service1 on node1
-                client = connect_to_node( 'localhost:5999' )
+                client = connect_to_node( '0.0.0.0:5999' )
                 response = client.call_addon( 'service1', 'hello' )
                 
                 # Wait for channel to sync
@@ -187,7 +187,7 @@ describe 'Tiq Integration Tests' do
                 "service2_got: #{shared}, service1_said: #{response}"
             }
             
-            result = Tiq::Addon( 'localhost:5998', 'service2' )
+            result = Tiq::Addon( '0.0.0.0:5998', 'service2' )
             expect( result ).to include 'service2_got: hello'
             expect( result ).to include 'service1_said: service1_response: hello'
         end
@@ -202,7 +202,7 @@ describe 'Tiq Integration Tests' do
             results = []
             5.times do
                 Thread.new do
-                    results << Tiq::Addon( 'localhost:5999', 'counter' )
+                    results << Tiq::Addon( '0.0.0.0:5999', 'counter' )
                 end
             end
             
@@ -213,8 +213,8 @@ describe 'Tiq Integration Tests' do
     end
 
     describe 'Channel synchronization patterns' do
-        let( :node1 ) { @node1 ||= Tiq::Node.new( url: 'localhost:4999' ) }
-        let( :node2 ) { @node2 ||= Tiq::Node.new( url: 'localhost:4998', peer: 'localhost:4999' ) }
+        let( :node1 ) { @node1 ||= Tiq::Node.new( url: '0.0.0.0:4999' ) }
+        let( :node2 ) { @node2 ||= Tiq::Node.new( url: '0.0.0.0:4998', peer: '0.0.0.0:4999' ) }
 
         before( :each ) do
             node1.start

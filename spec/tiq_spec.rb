@@ -38,7 +38,7 @@ describe Tiq do
     end
 
     describe 'Addon module methods' do
-        let( :node ) { @node ||= Tiq::Node.new( url: 'localhost:3999' ) }
+        let( :node ) { @node ||= Tiq::Node.new( url: '0.0.0.0:3999' ) }
 
         before( :each ) do
             node.start
@@ -65,13 +65,13 @@ describe Tiq do
 
         it 'calls addon via Tiq.Addon' do
             Tiq::Addon.Attach( node, 'test' ) { |arg| arg }
-            result = Tiq.Addon( 'localhost:3999', 'test', 'value' )
+            result = Tiq.Addon( '0.0.0.0:3999', 'test', 'value' )
             expect( result ).to eq 'value'
         end
 
         it 'calls addon via Tiq.Addon with client object' do
             Tiq::Addon.Attach( node, 'test2' ) { |arg| arg }
-            client = Tiq::Client.new( 'localhost:3999' )
+            client = Tiq::Client.new( '0.0.0.0:3999' )
             result = Tiq.Addon( client, 'test2', 'value2' )
             expect( result ).to eq 'value2'
             client.close

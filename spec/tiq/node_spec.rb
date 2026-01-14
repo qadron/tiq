@@ -1,8 +1,8 @@
 require 'spec_helper'
 
 describe Tiq::Node do
-    let( :node ) { @node ||= Tiq::Node.new( url: 'localhost:9999' ) }
-    let( :peer ) { @peer ||= Tiq::Node.new( url: 'localhost:9998', peer: 'localhost:9999' ) }
+    let( :node ) { @node ||= Tiq::Node.new( url: '0.0.0.0:9999' ) }
+    let( :peer ) { @peer ||= Tiq::Node.new( url: '0.0.0.0:9998', peer: '0.0.0.0:9999' ) }
 
     before( :each ) do
         node.start
@@ -20,7 +20,7 @@ describe Tiq::Node do
 
     describe '#url' do
         it 'returns the node URL' do
-            expect( node.url ).to eq 'localhost:9999'
+            expect( node.url ).to eq '0.0.0.0:9999'
         end
     end
 
@@ -33,7 +33,7 @@ describe Tiq::Node do
     describe '#peers' do
         it 'returns an array of peer URLs' do
             expect( node.peers ).to be_an Array
-            expect( peer.peers ).to include 'localhost:9999'
+            expect( peer.peers ).to include '0.0.0.0:9999'
         end
     end
 
@@ -51,7 +51,7 @@ describe Tiq::Node do
         it 'returns node information' do
             info = node.info
             expect( info ).to be_a Hash
-            expect( info['url'] ).to eq 'localhost:9999'
+            expect( info['url'] ).to eq '0.0.0.0:9999'
             expect( info['peers'] ).to be_an Array
             expect( info['unreachable_peers'] ).to be_an Array
         end
@@ -59,12 +59,12 @@ describe Tiq::Node do
 
     describe '#add_peer' do
         it 'adds a peer to the peer list' do
-            test_node = Tiq::Node.new( url: 'localhost:9997' ).start
+            test_node = Tiq::Node.new( url: '0.0.0.0:9997' ).start
             initial_count = node.peers.size
-            node.add_peer( 'localhost:9997' )
+            node.add_peer( '0.0.0.0:9997' )
             sleep 0.1
             expect( node.peers.size ).to eq initial_count + 1
-            expect( node.peers ).to include 'localhost:9997'
+            expect( node.peers ).to include '0.0.0.0:9997'
             test_node.shutdown
             sleep 0.5
         end
@@ -72,11 +72,11 @@ describe Tiq::Node do
 
     describe '#remove_peer' do
         it 'removes a peer from the peer list' do
-            test_node = Tiq::Node.new( url: 'localhost:9996' ).start
-            node.add_peer( 'localhost:9996' )
+            test_node = Tiq::Node.new( url: '0.0.0.0:9996' ).start
+            node.add_peer( '0.0.0.0:9996' )
             sleep 0.1
-            node.remove_peer( 'localhost:9996' )
-            expect( node.peers ).not_to include 'localhost:9996'
+            node.remove_peer( '0.0.0.0:9996' )
+            expect( node.peers ).not_to include '0.0.0.0:9996'
             test_node.shutdown
             sleep 0.5
         end
@@ -178,9 +178,9 @@ describe Tiq::Node do
 
     describe '.when_ready' do
         it 'calls block when node is ready' do
-            test_node = Tiq::Node.new( url: 'localhost:9995' ).start
+            test_node = Tiq::Node.new( url: '0.0.0.0:9995' ).start
             called = false
-            Tiq::Node.when_ready( 'localhost:9995' ) do
+            Tiq::Node.when_ready( '0.0.0.0:9995' ) do
                 called = true
             end
             sleep 1

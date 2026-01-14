@@ -1,8 +1,8 @@
 require 'spec_helper'
 
 describe Tiq::Client do
-    let( :node ) { @node ||= Tiq::Node.new( url: 'localhost:8999' ) }
-    let( :client ) { @client ||= Tiq::Client.new( 'localhost:8999' ) }
+    let( :node ) { @node ||= Tiq::Node.new( url: '0.0.0.0:8999' ) }
+    let( :client ) { @client ||= Tiq::Client.new( '0.0.0.0:8999' ) }
 
     before( :each ) do
         node.start
@@ -23,13 +23,13 @@ describe Tiq::Client do
         end
 
         it 'accepts handler option' do
-            custom_client = Tiq::Client.new( 'localhost:8999', handler: 'custom' )
+            custom_client = Tiq::Client.new( '0.0.0.0:8999', handler: 'custom' )
             expect( custom_client ).to be_a Tiq::Client
             custom_client.close
         end
 
         it 'accepts serializer option' do
-            yaml_client = Tiq::Client.new( 'localhost:8999', serializer: YAML )
+            yaml_client = Tiq::Client.new( '0.0.0.0:8999', serializer: YAML )
             expect( yaml_client ).to be_a Tiq::Client
             yaml_client.close
         end
@@ -49,7 +49,7 @@ describe Tiq::Client do
         it 'calls info method on node' do
             result = client.info
             expect( result ).to be_a Hash
-            expect( result['url'] ).to eq 'localhost:8999'
+            expect( result['url'] ).to eq '0.0.0.0:8999'
         end
 
         it 'calls methods with blocks asynchronously' do
@@ -87,7 +87,7 @@ describe Tiq::Client do
 
     describe 'channel operations' do
         it 'sets and gets channel data through client' do
-            channel_client = Tiq::Client.new( 'localhost:8999', handler: 'channel' )
+            channel_client = Tiq::Client.new( '0.0.0.0:8999', handler: 'channel' )
             channel_client.set( 'test_key', 'test_value' )
             sleep 0.1
             result = channel_client.get( 'test_key' )
@@ -98,7 +98,7 @@ describe Tiq::Client do
 
     describe 'error handling' do
         it 'handles connection to non-existent node' do
-            bad_client = Tiq::Client.new( 'localhost:7777', client_max_retries: 1 )
+            bad_client = Tiq::Client.new( '0.0.0.0:7777', client_max_retries: 1 )
             result = nil
             bad_client.alive? do |r|
                 result = r

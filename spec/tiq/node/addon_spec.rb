@@ -1,8 +1,8 @@
 require 'spec_helper'
 
 describe 'Tiq::Node::Addon' do
-    let( :node ) { @node ||= Tiq::Node.new( url: 'localhost:9999' ) }
-    let( :peer ) { @peer ||= Tiq::Node.new( url: 'localhost:9998', peer: 'localhost:9999' ) }
+    let( :node ) { @node ||= Tiq::Node.new( url: '0.0.0.0:9999' ) }
+    let( :peer ) { @peer ||= Tiq::Node.new( url: '0.0.0.0:9998', peer: '0.0.0.0:9999' ) }
 
     before( :each ) do
         node.start
@@ -67,7 +67,7 @@ describe 'Tiq::Node::Addon' do
             Tiq::Addon.Attach( node, 'echo' ) { |arguments|
                 arguments
             }
-            result = Tiq::Addon( 'localhost:9999', 'echo', 'test' )
+            result = Tiq::Addon( '0.0.0.0:9999', 'echo', 'test' )
             expect( result ).to eq 'test'
         end
 
@@ -76,7 +76,7 @@ describe 'Tiq::Node::Addon' do
                 arguments
             }
             result = nil
-            Tiq::Addon( 'localhost:9999', 'async_echo', 'async_test' ) do |r|
+            Tiq::Addon( '0.0.0.0:9999', 'async_echo', 'async_test' ) do |r|
                 result = r
             end
             sleep 0.5
@@ -90,7 +90,7 @@ describe 'Tiq::Node::Addon' do
                 Tiq::Addon.Attach( node, 'echo' ) { |arguments|
                     arguments
                 }
-                result = Tiq::Addon( 'localhost:9999', 'echo', 'test' )
+                result = Tiq::Addon( '0.0.0.0:9999', 'echo', 'test' )
                 expect( result ).to eq 'test'
             end
 
@@ -98,8 +98,8 @@ describe 'Tiq::Node::Addon' do
                 Tiq::Addon.Attach( node, 'node_info' ) {
                     @node.url
                 }
-                result = Tiq::Addon( 'localhost:9999', 'node_info' )
-                expect( result ).to eq 'localhost:9999'
+                result = Tiq::Addon( '0.0.0.0:9999', 'node_info' )
+                expect( result ).to eq '0.0.0.0:9999'
             end
 
             it 'attaches addon with access to channel' do
@@ -107,7 +107,7 @@ describe 'Tiq::Node::Addon' do
                     @channel.set( 'addon_key', 'addon_value' )
                     @channel.get( 'addon_key' )
                 }
-                result = Tiq::Addon( 'localhost:9999', 'channel_access' )
+                result = Tiq::Addon( '0.0.0.0:9999', 'channel_access' )
                 expect( result ).to eq 'addon_value'
             end
         end
@@ -117,14 +117,14 @@ describe 'Tiq::Node::Addon' do
                 Tiq::Addon::Attach( node, 'echo' ) { |arguments|
                     arguments
                 }
-                result = Tiq::Addon( 'localhost:9999', 'echo', 'test' )
+                result = Tiq::Addon( '0.0.0.0:9999', 'echo', 'test' )
                 expect( result ).to eq 'test'
 
                 Tiq::Addon.Dettach( node, 'echo' )
 
                 result = nil
                 begin
-                    Tiq::Addon( 'localhost:9999', 'echo', 'test' )
+                    Tiq::Addon( '0.0.0.0:9999', 'echo', 'test' )
                 rescue => e
                     result = e
                 end
@@ -142,7 +142,7 @@ describe 'Tiq::Node::Addon' do
                         sleep 0.2
                         result
                     }
-                    result = Tiq::Addon( 'localhost:9999', 'deferred' )
+                    result = Tiq::Addon( '0.0.0.0:9999', 'deferred' )
                     expect( result ).to eq 'deferred_result'
                 end
 
@@ -153,7 +153,7 @@ describe 'Tiq::Node::Addon' do
                         result = thread.value
                         result
                     }
-                    result = Tiq::Addon( 'localhost:9999', 'deferred_block' )
+                    result = Tiq::Addon( '0.0.0.0:9999', 'deferred_block' )
                     expect( result ).to eq 'block_result'
                 end
             end
@@ -161,10 +161,10 @@ describe 'Tiq::Node::Addon' do
             describe '#connect_to_node' do
                 it 'connects to another node' do
                     Tiq::Addon.Attach( node, 'connector' ) {
-                        client = connect_to_node( 'localhost:9998' )
+                        client = connect_to_node( '0.0.0.0:9998' )
                         client.alive?
                     }
-                    result = Tiq::Addon( 'localhost:9999', 'connector' )
+                    result = Tiq::Addon( '0.0.0.0:9999', 'connector' )
                     expect( result ).to be true
                 end
             end
@@ -176,7 +176,7 @@ describe 'Tiq::Node::Addon' do
                         iter = iterator_for( list )
                         iter.class.to_s
                     }
-                    result = Tiq::Addon( 'localhost:9999', 'iterator' )
+                    result = Tiq::Addon( '0.0.0.0:9999', 'iterator' )
                     expect( result ).to include 'Iterator'
                 end
             end
