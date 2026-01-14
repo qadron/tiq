@@ -35,6 +35,7 @@ class Node
     attr_reader :channel
     attr_reader :reactor
     attr_reader :server
+    attr_reader :options
 
     # Initializes the node by:
     #
