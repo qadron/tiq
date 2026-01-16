@@ -9,6 +9,10 @@ class Channel
 
         @on_set_cb    = {}
         @on_delete_cb = {}
+        @on_join_cb   = {}
+        @on_leave_cb  = {}
+        @on_disappear_cb = {}
+        @on_comeback_cb  = {}
 
         @handler = (options[:handler] || 'channel').to_s
         @node    = node
@@ -67,6 +71,26 @@ class Channel
         nil
     end
 
+    def on_join( k = nil, &block )
+        (@on_join_cb[sanitize_key( k )] ||= []) << block
+        nil
+    end
+
+    def on_leave( k = nil, &block )
+        (@on_leave_cb[sanitize_key( k )] ||= []) << block
+        nil
+    end
+
+    def on_disappear( k = nil, &block )
+        (@on_disappear_cb[sanitize_key( k )] ||= []) << block
+        nil
+    end
+
+    def on_comeback( k = nil, &block )
+        (@on_comeback_cb[sanitize_key( k )] ||= []) << block
+        nil
+    end
+
     def on_set( k = nil, &block )
         # p "#{@node} on_set #{k} 0 #{block}"
         (@on_set_cb[sanitize_key( k )] ||= []) << block
@@ -81,6 +105,32 @@ class Channel
     def to_h
         @hash.dup
     end
+
+    %w(on_join on_leave on_disappear on_comeback).each do |m|
+       define_method :"call_#{m}" do |peer_url|
+            k = sanitize_key( peer_url )
+
+            ivar = instance_variable_get( "@#{m}_cb" )
+
+            # Catch-all!
+            if ivar['']
+                ivar.each do |_, cbs|
+                    cbs.each do |cb|
+                        cb.call k
+                    end
+                end
+            end
+
+            if ivar[k]
+                ivar[k].each do |cb|
+                    cb.call k
+                end
+            end
+        end
+
+        nil
+    end
+
 
     private
 

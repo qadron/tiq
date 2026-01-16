@@ -18,6 +18,11 @@ describe Tiq::Node::Channel do
         sleep 0.5
     end
 
+    it 'calls on_join upon Node join'
+    it 'calls on_leave upon Node leaving'
+    it 'calls on_disappear upon Node disappearing'
+    it 'calls on_comeback upon Node coming back'
+
     it 'sets and gets data locally' do
         node.channel.set( 'key1', 'value1' )
         expect( node.channel.get( 'key1' ) ).to eq 'value1'

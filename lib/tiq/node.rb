@@ -226,6 +226,8 @@ class Node
 
         connect_to_peer( node_url ){ update_channel( @channel.to_h ) }
 
+        @channel.call_on_join node_url
+
         log_updated_peers
         true
     end
@@ -238,6 +240,9 @@ class Node
     def remove_peer( url )
         @peers.delete url
         @dead_nodes.delete url
+
+        @channel.call_on_leave url
+
         nil
     end
 
@@ -330,6 +335,8 @@ class Node
     def add_dead_peer( url )
         remove_peer( url )
         @dead_nodes << url
+
+        @channel.call_on_disappear url
     end
 
     def log_updated_peers
@@ -359,6 +366,8 @@ class Node
                 next if res.rpc_exception?
 
                 $stdout.puts "Peer came back to life: #{url}"
+                @channel.call_on_comeback url
+
                 ([@url] | peers).each do |node|
                     peer.add_peer( node ){}
                 end
