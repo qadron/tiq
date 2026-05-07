@@ -3,3 +3,4 @@ tmp/
 test/
 vendor/bundle
 .bundle
+/.idea/
